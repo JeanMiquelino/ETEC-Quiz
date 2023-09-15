@@ -1,5 +1,5 @@
 import perguntas from
-  '/assets/dados/perguntas.json' assert { type: 'json'};
+  '../dados/perguntas.json' assert { type: 'json'};
 
   //Variáveis
   let h3Pergunta = document.getElementById('h3Pergunta');
