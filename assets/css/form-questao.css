@@ -1,3 +1,7 @@
+
+* {
+    cursor: crosshair;
+}
 body {
     background: #ad5389;
     background: -webkit-linear-gradient(to right, #3c1053, #ad5389);
@@ -133,4 +137,16 @@ body {
 #btnPular,
 #btnParar {
     margin-left: 0.625rem;
+}
+@media screen and (max-width: 768px){
+    #btnParar{
+        margin-top: 10px;
+    }
+}
+.lnivel,
+.lpontos,
+.lpulos,
+.lerros {
+    font-size: 1.375rem;
+    text-wrap: nowrap;
 }

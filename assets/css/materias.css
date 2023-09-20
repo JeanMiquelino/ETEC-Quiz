@@ -115,13 +115,14 @@ body {
 }
 
 .btn {
+    cursor: crosshair;
     padding-top: 0.625rem;
     margin-top: 1.25rem;
     font-size: 1.5rem;
     font-weight: bold;
     background-color: greenyellow;
     height: 64px;
-    width: 300px;
+    width: 30%;
     padding-top:10px;
     border-radius: 0.9375rem;
     transition: box-shadow 0.3s; /* Adiciona transição suave na sombra */
@@ -142,3 +143,30 @@ body {
 * {
     cursor: crosshair;
 }
+@media screen and (max-width: 768px) {
+    .btn{
+        width: 200px;
+        .container{
+            display: block;
+        }
+    }
+
+.form-check-g{
+    margin-top: 5px;
+    margin-left: -5px;
+}
+.form-check-h{
+    margin-left:-5px ;
+}
+.form-check-i{
+    margin-left: -5px;
+}
+.form-check-m{
+    margin-left: 0px; 
+}
+.form-check-p{
+    margin-left: 0px;
+}
+.form-check-v{
+    margin-left: 0px;
+}}

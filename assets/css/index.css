@@ -60,6 +60,7 @@ body {
 }
 
 .btn {
+    cursor: crosshair;
     padding-top: 10px;
     margin-top: 0.9375rem;
     margin-bottom: 0.9375rem;
@@ -67,7 +68,8 @@ body {
     font-weight: bold;
     background-color: greenyellow;
     height: 64px;
-    width: 400px;
+    width: 25%;
+    max-width: 450px;
     border-radius: 0.9375rem;
     transition: box-shadow 0.3s; /* Adiciona transição suave na sombra */
     border: 0.125rem solid #000000; /* Adiciona a borda preta */
