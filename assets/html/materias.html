@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../css/materias.css">
+        <link rel="shortcut icon" href="../images/geral/logo.png" type="image/x-icon">
+        <title>Kinect - Quiz</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="form-label-container"><h1>Selecione A Matéria:</h1></div>
+            <div class="contp">
+                <div class="form-check-c" onclick="selecionarMateria('C')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaC" value="C">
+                    <label class="form-check-label" for="materiaC">Ciências</label>
+                    <img class="iconem" src="../images/materias/ciencias.png" alt="">
+                </div>
+                <div class="form-check-g" onclick="selecionarMateria('G')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaG" value="G">
+                    <label class="form-check-label" for="materiaG">Geografia</label>
+                    <img class="iconem" src="../images/materias/geografia.png" alt="">
+                </div>
+                <div class="form-check-h" onclick="selecionarMateria('H')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaH" value="H">
+                    <label class="form-check-label" for="materiaH">História</label>
+                    <img class="iconem" src="../images/materias/historia.png" alt="">
+                </div>
+                <div class="form-check-i" onclick="selecionarMateria('I')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaI" value="I">
+                    <label class="form-check-label" for="materiaI">Inglês</label>
+                    <img class="iconem" src="../images/materias/ingles.png" alt="">
+                </div>
+                <div class="form-check-m" onclick="selecionarMateria('M')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaM" value="M">
+                    <label class="form-check-label" for="materiaM">Matemática</label>
+                    <img class="iconem" src="../images/materias/matematica.png" alt="">
+                </div>
+                <div class="form-check-p" onclick="selecionarMateria('P')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaP" value="P">
+                    <label class="form-check-label" for="materiaP">Português</label>
+                    <img class="iconem" src="../images/materias/portugues.png" alt="">
+                </div>
+                <div class="form-check-v" onclick="selecionarMateria('V')">
+                    <input class="form-check-input" type="radio" name="materia" id="materiaV" value="V" checked>
+                    <label class="form-check-label" for="materiaV">Variado</label>
+                    <img class="iconem" src="../images/materias/variado.png" alt="">
+                </div>
+            </div>
+            
+                        
+            <div class="text-center">
+                <a class="btn" href="./form-questao.html" onclick="jogar()">
+                    <img class="playicon"src="../images/geral/play.png" alt="">
+                    Jogar
+                </a>
+            </div>
+            
+        
+        <script src="../js/materias.js"></script>
+    </body>
+</html>
