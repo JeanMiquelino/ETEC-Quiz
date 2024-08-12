@@ -1,212 +1,208 @@
-// Variáveis globais
-let perguntasDisponiveis = [];
-let index = 0;
-let pontuacao = 0;
-let qtdePulos = 0;
-let qtdeErros = 0;
-let nivel = 'A';
-let materiaSelecionada = 'C'; // Ajuste conforme necessário
-let cronometroInterval; // Armazena o identificador do cronômetro
-let tempoRestante = 60; // Define o tempo inicial em segundos para cada pergunta
+// Carregando o arquivo JSON usando Fetch API
+let perguntas = [];
+fetch('../dados/perguntas.json')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao carregar o JSON');
+        }
+        return response.json();
+    })
+    .then(data => {
+        perguntas = data;
+        // Inicializar a partida após carregar as perguntas
+        atualizarDadosPartida();
+        sortear();
+    })
+    .catch(error => console.error('Erro ao carregar o JSON:', error));
 
-// Função para carregar perguntas de um arquivo JSON
-async function carregarPerguntas() {
-  try {
-    const response = await fetch('../dados/perguntas.json');
-    if (!response.ok) {
-      throw new Error(`Erro ao carregar o arquivo JSON: ${response.statusText}`);
-    }
-    const perguntas = await response.json();
-    iniciarJogo(perguntas);
-  } catch (error) {
-    console.error(error);
-  }
-}
+// Variáveis
+let tempoRestante = 60; // Tempo em segundos (ajuste conforme necessário)
+let cronometroInterval;
+let h3Pergunta = document.getElementById('h3Pergunta');
+let labelResposta01 = document.getElementById('labelResposta01');
+let labelResposta02 = document.getElementById('labelResposta02');
+let labelResposta03 = document.getElementById('labelResposta03');
+let labelResposta04 = document.getElementById('labelResposta04');
+let btnConfirmar = document.getElementById('btnConfirmar');
+let btnPular = document.getElementById('btnPular');
+let btnParar = document.getElementById('btnParar');
+let spanNivel = document.getElementById('spanNivel');
+let spanPontuacao = document.getElementById('spanPontuacao');
+let spanPulos = document.getElementById('spanPulos');
+let spanErros = document.getElementById('spanErros');
+let materiaSelecionada = sessionStorage.getItem('materia-selecionada');
+let nivel = 'A';
+let pontuacao = 0;
+let qtdePulos = 3;
+let qtdeErros = 0;
+let perguntasDisponiveis = [];
+let index;
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Chamar a função de carregamento de perguntas
-  carregarPerguntas();
-
-  var respostas = document.querySelectorAll('.resp1, .resp2, .resp3, .resp4');
-  respostas.forEach(function(resposta) {
-    resposta.addEventListener('click', function() {
-      var radio = this.querySelector('input[type="radio"]');
-      if (radio) {
-        radio.checked = true;
-      }
+    var respostas = document.querySelectorAll('.resp1, .resp2, .resp3, .resp4');
+    respostas.forEach(function(resposta) {
+        resposta.addEventListener('click', function() {
+            var radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+        });
     });
-  });
 });
 
-// Selecionar elementos do DOM
-const h3Pergunta = document.getElementById('h3Pergunta');
-const labelResposta01 = document.getElementById('labelResposta01');
-const labelResposta02 = document.getElementById('labelResposta02');
-const labelResposta03 = document.getElementById('labelResposta03');
-const labelResposta04 = document.getElementById('labelResposta04');
-const btnConfirmar = document.getElementById('btnConfirmar');
-const btnPular = document.getElementById('btnPular');
-const btnParar = document.getElementById('btnParar');
-const spanNivel = document.getElementById('spanNivel');
-const spanPontuacao = document.getElementById('spanPontuacao');
-const spanPulos = document.getElementById('spanPulos');
-const spanErros = document.getElementById('spanErros');
-
-// Função que inicializa o jogo com as perguntas carregadas
-function iniciarJogo(perguntas) {
-  // Verifique se os elementos DOM existem
-  if (!h3Pergunta || !labelResposta01 || !labelResposta02 || !labelResposta03 || !labelResposta04) {
-    console.error('Erro: Não foi possível encontrar um ou mais elementos DOM.');
-    return;
-  }
-
-  // Definição de Eventos
-  btnConfirmar.addEventListener('click', () => validarResposta(perguntas));
-  btnPular.addEventListener('click', () => pular(perguntas));
-  btnParar.addEventListener('click', () => parar());
-
-  atualizarDadosPartida();
-  sortear(perguntas);
-}
+// Definição de Eventos
+btnConfirmar.addEventListener('click', () => validarResposta());
+btnPular.addEventListener('click', () => pular());
+btnParar.addEventListener('click', () => parar());
 
 // Definição de Funções
-function validarResposta(perguntas) {
-  let resp = retornarRespostaSelecionada();
+function validarResposta() {
+    let resp = retornarRespostaSelecionada();
 
-  console.log('Resposta Selecionada:', resp);
+    console.log('Resposta Selecionada:', resp);
 
-  if (resp == null) {
-    alert('Selecione uma resposta antes de confirmar!!!');
-    return; // Retorna imediatamente se nenhuma resposta foi selecionada
-  }
+    if (resp == null) {
+        alert('Selecione uma resposta antes de confirmar!!!');
+        return; // Retorna imediatamente se nenhuma resposta foi selecionada
+    }
 
-  if (resp.value == perguntasDisponiveis[index].CERTA) {
-    alert('Parabéns... Você Acertou!!!');
-    pontuacao++;
+    if (resp.value == perguntasDisponiveis[index].CERTA) {
+        alert('Parabéns... Você Acertou!!!');
+        pontuacao++;
 
-    if (pontuacao == 20) {
-      alert('Parabéns... VOCÊ GANHOU!!!');
-      window.location.href = "../../index.html"
+        if (pontuacao == 20) {
+            alert('Parabéns... VOCÊ GANHOU!!!');
+            window.location.href = "../../index.html";
+        } else {
+            nivel = pontuacao <= 4 ? 'A' :
+                    pontuacao <= 9 ? 'B' :
+                    pontuacao <= 14 ? 'C' :
+                    'D';
+        }
     } else {
-      nivel = pontuacao <= 4 ? 'A' :
-              pontuacao <= 9 ? 'B' :
-              pontuacao <= 14 ? 'C' :
-              'D';
+        let respostaCorreta = 
+            perguntasDisponiveis[index].CERTA == 1 ? perguntasDisponiveis[index].RESP1 :
+            perguntasDisponiveis[index].CERTA == 2 ? perguntasDisponiveis[index].RESP2 :
+            perguntasDisponiveis[index].CERTA == 3 ? perguntasDisponiveis[index].RESP3 :
+            perguntasDisponiveis[index].RESP4;
+
+        alert(`Que Pena... Você Errou \nResposta Correta: ${respostaCorreta}`);
+        qtdeErros++;
+
+        if (qtdeErros == 3) {
+            alert('Fim de Jogo!!!');
+            enviarpontuacao();
+            window.location.href = "../../index.html";
+        }
     }
-  } else {
-    let respostaCorreta = 
-      perguntasDisponiveis[index].CERTA == 1 ? perguntasDisponiveis[index].RESP1 :
-      perguntasDisponiveis[index].CERTA == 2 ? perguntasDisponiveis[index].RESP2 :
-      perguntasDisponiveis[index].CERTA == 3 ? perguntasDisponiveis[index].RESP3 :
-      perguntasDisponiveis[index].RESP4;
 
-    alert(`Que Pena... Você Errou \nResposta Correta: ${respostaCorreta}`);
-    qtdeErros++;
+    resp.checked = false;
 
-    if (qtdeErros == 3) {
-      alert('Fim de Jogo!!!');
-      window.location.href = "../../index.html"
-    }
-  }
-
-  resp.checked = false;
-
-  atualizarDadosPartida();
-  sortear(perguntas);
+    atualizarDadosPartida();
+    sortear();
 }
 
-function pular(perguntas) {
-  qtdePulos++;
-  if (qtdePulos == 3) {
-    btnPular.disabled = true;
-  }
+function pular() {
+    qtdePulos--;
+    if (qtdePulos == 0) {
+        btnPular.disabled = true;
+    }
     
-  let resp = retornarRespostaSelecionada();
-  if (resp != null) {
-    resp.checked = false;
-  }
+    let resp = retornarRespostaSelecionada();
+    if (resp != null) {
+        resp.checked = false;
+    }
 
-  atualizarDadosPartida();
-  sortear(perguntas);    
+    atualizarDadosPartida();
+    sortear();    
 }
 
 function atualizarDadosPartida() {
-  tempoRestante = 60; // Reinicia o cronômetro para 60 segundos
-  spanNivel.innerText = `Nível: ${nivel}`;
-  spanPontuacao.innerText = `Pontos: ${pontuacao}`;
-  spanPulos.innerText = `Pulos: ${qtdePulos}`;
-  spanErros.innerText = `Erros: ${qtdeErros}`;
+    tempoRestante = 60;
+    spanNivel.innerText = `Nível: ${nivel}`;
+    spanPontuacao.innerText = `Pontos: ${pontuacao}`;
+    spanPulos.innerText = `Pulos: ${qtdePulos}`;
+    spanErros.innerText = `Erros: ${qtdeErros}`;
 }
 
-function iniciarCronometro(perguntas) {
-  cronometroInterval = setInterval(function() {
-    if (tempoRestante <= 0) {
-      let resp = retornarRespostaSelecionada();
-      // Tempo esgotado, faça algo (por exemplo, chame a função de validação)
-      clearInterval(cronometroInterval);
-      if (resp == null) {
-        if (qtdePulos > 2) {
-          alert('Fim de Jogo!!!');
-          window.location.href = "../../index.html"
+function iniciarCronometro() {
+    cronometroInterval = setInterval(function() {
+        if (tempoRestante <= 0) {
+            let resp = retornarRespostaSelecionada();
+            clearInterval(cronometroInterval);
+            if (resp == null){
+                if(qtdePulos < 1){
+                    alert('Fim de Jogo!!!');
+                    enviarpontuacao();
+                    window.location.href = "../../index.html";
+                } else {
+                    alert("O Tempo Acabou!!!");
+                    pular();
+                }
+            } else {
+                validarResposta();
+            }
         } else {
-          alert("O Tempo Acabou!!!")
-          pular(perguntas);
+            const minutos = Math.floor(tempoRestante / 60);
+            const segundos = tempoRestante % 60;
+            const cronometroElement = document.getElementById('cronometro');
+            cronometroElement.textContent = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+            tempoRestante--;
         }
-      } else {
-        validarResposta(perguntas);
-      }
-    } else {
-      // Atualize o cronômetro e exiba-o no elemento HTML
-      const minutos = Math.floor(tempoRestante / 60);
-      const segundos = tempoRestante % 60;
-      const cronometroElement = document.getElementById('cronometro');
-      cronometroElement.textContent = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-      tempoRestante--;
-    }
-  }, 1000); // Atualize a cada segundo
+    }, 1000); // Atualize a cada segundo
 }
 
-function sortear(perguntas) {
-  // Pare o cronômetro se estiver ativo
-  clearInterval(cronometroInterval);
-  
-  // Inicie o cronômetro para a nova pergunta
-  iniciarCronometro(perguntas);
+function sortear() {
+    clearInterval(cronometroInterval);
+    iniciarCronometro();
 
-  perguntasDisponiveis = perguntas.filter(pergunta => {
-    return pergunta.MATERIA == materiaSelecionada &&
-           pergunta.NIVEL == nivel &&
-           pergunta.JA_FOI == 'N';
-  });
+    perguntasDisponiveis = perguntas.filter(pergunta => {
+        return pergunta.MATERIA == materiaSelecionada &&
+            pergunta.NIVEL == nivel &&
+            pergunta.JA_FOI == 'N';
+    });
 
-  if (perguntasDisponiveis.length === 0) {
-    console.error('Erro: Nenhuma pergunta disponível para o nível e matéria selecionados.');
-    return;
-  }
+    index = Math.floor(Math.random() * perguntasDisponiveis.length);
 
-  index = Math.floor(Math.random() * perguntasDisponiveis.length);
-
-  for (let idx = 0; idx < perguntas.length; idx++) {
-    if (perguntas[idx].PERGUNTA == perguntasDisponiveis[index].PERGUNTA) {
-      perguntas[idx].JA_FOI = 'S';
-      break;
+    for (let idx = 0; idx < perguntas.length; idx++) {
+        if (perguntas[idx].PERGUNTA == perguntasDisponiveis[index].PERGUNTA) {
+            perguntas[idx].JA_FOI = 'S';
+            break;
+        }
     }
-  }
 
-  // Movendo os dados do array de posição (index) 0 para a tela
-  h3Pergunta.innerText = perguntasDisponiveis[index].PERGUNTA;
-  labelResposta01.innerText = perguntasDisponiveis[index].RESP1;
-  labelResposta02.innerText = perguntasDisponiveis[index].RESP2;
-  labelResposta03.innerText = perguntasDisponiveis[index].RESP3;
-  labelResposta04.innerText = perguntasDisponiveis[index].RESP4;    
+    h3Pergunta.innerText = perguntasDisponiveis[index].PERGUNTA;
+    labelResposta01.innerText = perguntasDisponiveis[index].RESP1;
+    labelResposta02.innerText = perguntasDisponiveis[index].RESP2;
+    labelResposta03.innerText = perguntasDisponiveis[index].RESP3;
+    labelResposta04.innerText = perguntasDisponiveis[index].RESP4;    
 }
 
 function parar() {
-  alert('Que pena, você desistiu!!!');
-  window.location.href = "../../index.html"
+    alert('Que pena, você desistiu!!!');
+    enviarpontuacao();
+    window.location.href = "../../index.html";
 }
 
 function retornarRespostaSelecionada() {
-  let resposta = document.querySelector('input[name="resposta"]:checked');
-  return resposta;
+    let resposta = document.querySelector('input[name="resposta"]:checked');
+    return resposta;
+}
+
+function enviarpontuacao(){
+    const nomeJogador = localStorage.getItem('nomeJogador'); // Substitua pelo nome do jogador
+    const pontos = pontuacao; // Substitua pela pontuação do jogador
+
+    fetch('../php/inserir_pontuacao.php', {
+        method: 'POST',
+        body: JSON.stringify({ nomeJogador, pontos }), // Alterado de 'pontuacao' para 'pontos'
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data); // Deve imprimir a resposta do servidor (sucesso ou erro)
+    })
+    .catch(error => {
+        console.error('Erro ao enviar os dados para o servidor:', error);
+    });
 }
